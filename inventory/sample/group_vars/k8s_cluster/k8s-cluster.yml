@@ -21,7 +21,7 @@ kube_version: v1.31.3
 
 # Where the binaries will be downloaded.
 # Note: ensure that you've enough disk space (about 1G)
-local_release_dir: "/tmp/releases"
+local_release_dir: "/tmp/releases-{{ kube_version }}"
 # Random shifts for retrying failed ops like pushing/downloading
 retry_stagger: 5
 
@@ -311,12 +311,14 @@ persistent_volumes_enabled: false
 ## Container Engine Acceleration
 ## Enable container acceleration feature, for example use gpu acceleration in containers
 # nvidia_accelerator_enabled: true
+
 ## Nvidia GPU driver install. Install will by done by a (init) pod running as a daemonset.
 ## Important: if you use Ubuntu then you should set in all.yml 'docker_storage_options: -s overlay2'
 ## Array with nvida_gpu_nodes, leave empty or comment if you don't want to install drivers.
 ## Labels and taints won't be set to nodes if they are not in the array.
-# nvidia_gpu_nodes:
-#   - kube-gpu-001
+## Dynamic render gpu node list via ansible inventory group.
+# nvidia_gpu_nodes: "{{ groups['nvidia_gpu_nodes'] | list }}"
+
 # nvidia_driver_version: "384.111"
 ## flavor can be tesla or gtx
 # nvidia_gpu_flavor: gtx
