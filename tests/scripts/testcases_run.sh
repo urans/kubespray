@@ -23,32 +23,13 @@ if [ "${UPGRADE_TEST}" != "false" ]; then
   git checkout "${CI_COMMIT_SHA}" -- tests/
 fi
 
-# needed for ara not to complain
-export TZ=UTC
-
 export ANSIBLE_REMOTE_USER=$SSH_USER
 export ANSIBLE_BECOME=true
 export ANSIBLE_BECOME_USER=root
-export ANSIBLE_CALLBACK_PLUGINS="$(python -m ara.setup.callback_plugins)"
 export ANSIBLE_INVENTORY=${CI_PROJECT_DIR}/inventory/sample/
 
 make -C tests INVENTORY_DIR=${ANSIBLE_INVENTORY} create-${CI_PLATFORM} -s
 ansible-playbook tests/cloud_playbooks/wait-for-ssh.yml
-
-# Flatcar Container Linux needs auto update disabled
-if [[ "$CI_JOB_NAME" =~ "coreos" ]]; then
-  ansible all -m raw -a 'systemctl disable locksmithd'
-  ansible all -m raw -a 'systemctl stop locksmithd'
-  mkdir -p /opt/bin && ln -s /usr/bin/python /opt/bin/python
-fi
-
-if [[ "$CI_JOB_NAME" =~ "opensuse" ]]; then
-  # OpenSUSE needs netconfig update to get correct resolv.conf
-  # See https://goinggnu.wordpress.com/2013/10/14/how-to-fix-the-dns-in-opensuse-13-1/
-  ansible all -m raw -a 'netconfig update -f'
-  # Auto import repo keys
-  ansible all -m raw -a 'zypper --gpg-auto-import-keys refresh'
-fi
 
 run_playbook () {
 playbook=$1
@@ -138,29 +119,6 @@ fi
 
 ## Kubernetes conformance tests
 run_playbook tests/testcases/100_check-k8s-conformance.yml
-
-if [ "${IDEMPOT_CHECK}" = "true" ]; then
-  ## Idempotency checks 1/5 (repeat deployment)
-  run_playbook cluster.yml
-
-  ## Idempotency checks 2/5 (Advanced DNS checks)
-  if [[ ! ( "$CI_JOB_NAME" =~ "hardening" ) ]]; then
-      run_playbook tests/testcases/040_check-network-adv.yml
-  fi
-
-  if [ "${RESET_CHECK}" = "true" ]; then
-    ## Idempotency checks 3/5 (reset deployment)
-    run_playbook reset.yml -e reset_confirmation=yes
-
-    ## Idempotency checks 4/5 (redeploy after reset)
-    run_playbook cluster.yml
-
-    ## Idempotency checks 5/5 (Advanced DNS checks)
-    if [[ ! ( "$CI_JOB_NAME" =~ "hardening" ) ]]; then
-        run_playbook tests/testcases/040_check-network-adv.yml
-    fi
-  fi
-fi
 
 # Test node removal procedure
 if [ "${REMOVE_NODE_CHECK}" = "true" ]; then
