@@ -21,7 +21,7 @@ kube_version: v1.31.3
 
 # Where the binaries will be downloaded.
 # Note: ensure that you've enough disk space (about 1G)
-local_release_dir: "/tmp/releases-{{ kube_version }}"
+local_release_dir: "/tmp/releases"
 # Random shifts for retrying failed ops like pushing/downloading
 retry_stagger: 5
 

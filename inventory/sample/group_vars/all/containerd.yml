@@ -5,8 +5,7 @@
 # containerd_state_dir: "/run/containerd"
 # containerd_oom_score: 0
 
-# Dynamic set container runtime by ansible inventory group
-# containerd_default_runtime: "{{ 'nvidia' if inventory_hostname in groups['nvidia_gpu_nodes'] else 'runc' }}"
+# containerd_default_runtime: "runc"
 # containerd_snapshotter: "native"
 
 # containerd_runc_runtime:
@@ -21,15 +20,6 @@
 #     type: "io.containerd.kata.v2"
 #     engine: ""
 #     root: ""
-
-# Example for Nvidia as additional runtime:
-# containerd_additional_runtimes:
-#   - name: nvidia
-#     type: "io.containerd.runc.v2"
-#     engine: ""
-#     root: ""
-#     options:
-#       BinaryName: "/usr/bin/nvidia-container-runtime"
 
 # containerd_grpc_max_recv_message_size: 16777216
 # containerd_grpc_max_send_message_size: 16777216
