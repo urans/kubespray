@@ -260,7 +260,7 @@ node_labels:
 
   Example of `node_labels` defination in `inventory.ini` format:
 
-```yml
+```toml
 [sample_inventory_group:vars]
 node_labels={"label1_name":"label1_value", "label2_name":"label2_value"}
 ```
