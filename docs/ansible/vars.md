@@ -258,7 +258,7 @@ node_labels:
   label2_name: label2_value
 ```
 
-  Example of `node_labels` defination in `inventory.ini` format:
+  Example of `node_labels` definition in `inventory.ini` format:
 
 ```toml
 [sample_inventory_group:vars]
